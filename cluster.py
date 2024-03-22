@@ -14,11 +14,22 @@ def initiate_clustering(cluster_2_grid: cluster_2_gird_dict) -> None:
          c = Cluster(index = index, members_grid= cluster_2_grid[index])
 def get_cluster_data_from_grid(grid_2_data: Dict[Tuple[int, int], NDArray],
                                members_grid:List[Tuple[int, int]]) -> NDArray:
+    try:
+        cluster_arr = np.vstack([grid_2_data[grid] for grid in members_grid])
+        return cluster_arr
+    except ValueError:
+        ...
 
-    cluster_arr = np.vstack([grid_2_data[grid] for grid in members_grid])
-    return cluster_arr
 
+def update_all_clusters(grid_2_data: grid_2_data_dict, k_adjusments: NDArray)->None:
+    cluster_keys_copy = list(Cluster.clusters.keys())
+    for index in cluster_keys_copy:
+        update_cluster(index,grid_2_data,k_adjusments)
 def update_cluster(cluster_index: int,grid_2_data: grid_2_data_dict, k_adjusments: NDArray)->None:
+    cluster = Cluster.clusters[cluster_index]
+    if len(cluster.members_grid)<=1:
+        cluster.remove()
+        return
     update_cluster_data(grid_2_data,cluster_index)
     update_cluster_mean(cluster_index)
     update_cluster_std(cluster_index)
@@ -66,7 +77,8 @@ class Cluster:
         self.gravity = None
         self.inv_cov_matrix = None
         self.std = None
-
+    def remove(self):
+        self.clusters.pop(self.index)
 
 
 
