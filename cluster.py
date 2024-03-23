@@ -2,7 +2,6 @@ from collections import defaultdict
 from numpy.typing import NDArray
 from typing import List, Tuple, Dict
 import numpy as np
-
 # from control import grid_2_cluster
 
 gravity_constant_3d = np.sqrt(2 * np.pi ** 3)
@@ -10,7 +9,7 @@ k_array = np.asarray([10, 10, 1])
 epsilon = 10 ** -6
 cluster_2_gird_dict = Dict[int, List[Tuple[int, int]]]
 grid_2_data_dict = Dict[Tuple[int, int], NDArray]
-grid_2_cluster_dict = Dict[Tuple[int, int], int]
+grid_2_cluster_dict = Dict[Tuple[int,int],int]
 
 
 class Cluster:
@@ -35,13 +34,14 @@ def initiate_clustering(cluster_2_grid: cluster_2_gird_dict) -> None:
         Cluster(index=index, members_grid=cluster_2_grid[index])
 
 
-def update_all_clusters(grid_2_data: grid_2_data_dict, k_adjustments: NDArray) -> None:
+
+def update_all_clusters(grid_2_data: grid_2_data_dict, k_adjusments: NDArray) -> None:
     cluster_keys_copy = list(Cluster.clusters.keys())
     for index in cluster_keys_copy:
-        update_cluster(index, grid_2_data, k_adjustments)
+        update_cluster(index, grid_2_data, k_adjusments)
 
 
-def update_cluster(cluster_index: int, grid_2_data: grid_2_data_dict, k_adjustments: NDArray) -> None:
+def update_cluster(cluster_index: int, grid_2_data: grid_2_data_dict, k_adjusments: NDArray) -> None:
     cluster = Cluster.clusters[cluster_index]
     if len(cluster.members_grid) <= 1:
         cluster.remove()
@@ -49,7 +49,7 @@ def update_cluster(cluster_index: int, grid_2_data: grid_2_data_dict, k_adjustme
     update_cluster_data(grid_2_data, cluster)
     update_cluster_mean(cluster)
     update_cluster_std(cluster)
-    update_cluster_gravity(cluster, k_adjustments)
+    update_cluster_gravity(cluster, k_adjusments)
 
 
 def update_cluster_data(grid_2_data: grid_2_data_dict, cluster: Cluster) -> None:
