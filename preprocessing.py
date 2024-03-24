@@ -1,7 +1,7 @@
 from collections import defaultdict
 import numpy as np
 from numpy.typing import NDArray
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Set
 from PIL import Image
 
 image_2_data_dict: Dict[Tuple[int, int], NDArray] = {}
@@ -13,7 +13,7 @@ image_2_data_dict: Dict[Tuple[int, int], NDArray] = {}
 
 # by data here the array is meant that holds the value [row, column, gray_scale_value]
 
-def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, List[Tuple[int, int]]],
+def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, Set[Tuple[int, int]]],
                                                             Dict[Tuple[int, int], int]]:
     cluster_2_grid_dict = defaultdict()
     grid_2_cluster_dict = defaultdict()
@@ -27,10 +27,10 @@ def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, List[Tuple
     cluster_index = 1
     for i in range(first_iter_over_rows):
         for j in range(first_iter_over_cols):
-            cluster_2_grid_dict[cluster_index] = [(t, k) for t in
+            cluster_2_grid_dict[cluster_index] = {(t, k) for t in
                                                   range(i * tile_size, (i + 1) * tile_size)
                                                   for k in
-                                                  range(j * tile_size, (j + 1) * tile_size)]
+                                                  range(j * tile_size, (j + 1) * tile_size)}
             temp_grid_2_cluster_dict = {(t, k): cluster_index
                                         for t in range(i * tile_size, (i + 1) * tile_size)
                                         for k in range(j * tile_size, (j + 1) * tile_size)}
@@ -51,9 +51,9 @@ def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, List[Tuple
         if ideal_col_length < first_col_index_not_covered:
             last_iter_over_cols = first_col_index_not_covered // ideal_col_length
             for i in range(last_iter_over_cols):
-                cluster_2_grid_dict[cluster_index] = [(t, k)
+                cluster_2_grid_dict[cluster_index] = {(t, k)
                                                       for t in range(first_row_index_not_covered, n_rows)
-                                                      for k in range(ideal_col_length * i, ideal_col_length * (i + 1))]
+                                                      for k in range(ideal_col_length * i, ideal_col_length * (i + 1))}
 
                 temp_grid_2_cluster_dict = {(t, k): cluster_index
                                             for t in range(first_row_index_not_covered, n_rows)
@@ -62,10 +62,10 @@ def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, List[Tuple
 
                 cluster_index += 1
 
-            cluster_2_grid_dict[cluster_index] = [(t, k)
+            cluster_2_grid_dict[cluster_index] = {(t, k)
                                                   for t in range(first_row_index_not_covered, n_rows)
                                                   for k in range(last_iter_over_cols * ideal_col_length,
-                                                                 first_col_index_not_covered)]
+                                                                 first_col_index_not_covered)}
             temp_grid_2_cluster_dict = {(t, k): cluster_index
                                         for t in range(first_row_index_not_covered, n_rows)
                                         for k in range(last_iter_over_cols * ideal_col_length,
@@ -73,9 +73,9 @@ def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, List[Tuple
             grid_2_cluster_dict.update(temp_grid_2_cluster_dict)
             cluster_index += 1
         else:
-            cluster_2_grid_dict[cluster_index] = [(t, k)
+            cluster_2_grid_dict[cluster_index] = {(t, k)
                                                   for t in range(first_row_index_not_covered, n_rows)
-                                                  for k in range(first_col_index_not_covered)]
+                                                  for k in range(first_col_index_not_covered)}
             temp_grid_2_cluster_dict = {(t, k): cluster_index
                                         for t in range(first_row_index_not_covered, n_rows)
                                         for k in range(first_col_index_not_covered)}
@@ -88,11 +88,11 @@ def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, List[Tuple
         if ideal_row_length < first_row_index_not_covered:
             last_iter_over_rows = first_row_index_not_covered // ideal_row_length
             for i in range(last_iter_over_rows):
-                cluster_2_grid_dict[cluster_index] = [(t, k)
+                cluster_2_grid_dict[cluster_index] = {(t, k)
                                                       for t in range(ideal_row_length * i,
                                                                      ideal_row_length * (i + 1))
                                                       for k in
-                                                      range(first_col_index_not_covered, n_cols)]
+                                                      range(first_col_index_not_covered, n_cols)}
                 temp_grid_2_cluster_dict = {(t, k): cluster_index
                                             for t in range(ideal_row_length * i,
                                                            ideal_row_length * (i + 1))
@@ -101,11 +101,11 @@ def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, List[Tuple
                 grid_2_cluster_dict.update(temp_grid_2_cluster_dict)
                 cluster_index += 1
 
-            cluster_2_grid_dict[cluster_index] = [(t, k)
+            cluster_2_grid_dict[cluster_index] = {(t, k)
                                                   for t in
                                                   range(ideal_row_length * last_iter_over_rows,
                                                         first_row_index_not_covered)
-                                                  for k in range(first_col_index_not_covered, n_cols)]
+                                                  for k in range(first_col_index_not_covered, n_cols)}
             temp_grid_2_cluster_dict = {(t, k): cluster_index
                                         for t in
                                         range(ideal_row_length * last_iter_over_rows,
@@ -115,9 +115,9 @@ def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, List[Tuple
             cluster_index += 1
 
         else:
-            cluster_2_grid_dict[cluster_index] = [(t, k)
+            cluster_2_grid_dict[cluster_index] = {(t, k)
                                                   for t in range(first_row_index_not_covered)
-                                                  for k in range(first_col_index_not_covered, n_cols)]
+                                                  for k in range(first_col_index_not_covered, n_cols)}
             temp_grid_2_cluster_dict = {(t, k): cluster_index
                                         for t in range(first_row_index_not_covered)
                                         for k in range(first_col_index_not_covered, n_cols)}
@@ -125,9 +125,9 @@ def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, List[Tuple
             cluster_index += 1
 
     if n_rows % tile_size != 0 and n_cols % tile_size != 0:
-        cluster_2_grid_dict[cluster_index] = [(t, k)
+        cluster_2_grid_dict[cluster_index] = {(t, k)
                                               for t in range(first_row_index_not_covered, n_rows)
-                                              for k in range(first_col_index_not_covered, n_cols)]
+                                              for k in range(first_col_index_not_covered, n_cols)}
         temp_grid_2_cluster_dict = {(t, k): cluster_index
                                     for t in range(first_row_index_not_covered, n_rows)
                                     for k in range(first_col_index_not_covered, n_cols)}
