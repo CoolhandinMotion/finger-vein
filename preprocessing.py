@@ -143,7 +143,15 @@ def load_image(image_url: str, standard_scaling=False, round_decimal: int = 6) -
     return image_array
 
 
-def get_grid_2_data(image: NDArray) -> dict:
+def ordinary_grid_2_data(image: NDArray) -> dict:
+    grid_2_data_dict = {(i, j): np.asarray([i, j, image[i][j]])
+                        for i in range(image.shape[0])
+                        for j in range(image.shape[1])}
+    return grid_2_data_dict
+
+
+def riemann_sphere_grid_2_data(image: NDArray) -> dict:
+    image_center = []
     grid_2_data_dict = {(i, j): np.asarray([i, j, image[i][j]])
                         for i in range(image.shape[0])
                         for j in range(image.shape[1])}
