@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
+import gc
 import time
 import numpy as np
 from typing import Dict, Protocol, Set, Tuple
@@ -107,4 +108,5 @@ class Control:
                 self.handle_hostile_merges(hostile_index=hostile_index, merge_set=merge_set)
             print(f"it took..{np.around(time.time() - epoch_start, decimals=2)} Seconds")
             print("/"*36)
+            gc.collect()
 

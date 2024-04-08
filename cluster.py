@@ -1,3 +1,5 @@
+from dataclasses import dataclass, field
+
 from numpy.typing import NDArray, ArrayLike
 from typing import List, Tuple, Dict, Set
 import numpy as np
@@ -8,18 +10,25 @@ cluster_2_gird_dict = Dict[int, Set[Tuple[int, int]]]
 grid_2_data_dict = Dict[Tuple[int, int], NDArray]
 grid_2_cluster_dict = Dict[Tuple[int, int], int]
 
-
+@dataclass(slots=True)
 class Cluster:
     # data is all three dimensional data that is held my members
     # mambers_grid is just (i,j) tuple thats serves as key and coordinates of pixels
-    def __init__(self, index: int, members_grid: Set[Tuple[int, int]]):
-        self.index = index
-        self.members_grid = members_grid
-        self.data = None
-        self.mean = None
-        self.gravity = None
-        self.inv_cov_matrix = None
-        self.std = None
+    # def __init__(self, index: int, members_grid: Set[Tuple[int, int]]):
+    #     self.index = index
+    #     self.members_grid = members_grid
+    #     self.data = None
+    #     self.mean = None
+    #     self.gravity = None
+    #     self.inv_cov_matrix = None
+    #     self.std = None
+    index: int
+    members_grid: Set[Tuple[int, int]]
+    data:NDArray = field(init=False)
+    mean:NDArray = field(init=False)
+    gravity:NDArray = field(init=False)
+    inv_cov_matrix:NDArray = field(init=False)
+    std:NDArray = field(init=False)
 
     def update(self, grid_2_data: grid_2_data_dict,
                k_adjustments: NDArray, epsilon: float) -> bool:

@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 from typing import Dict, Tuple, List, Set
 from preprocessing import grid_tiling, load_image, ordinary_grid_2_data
 from numpy._typing import NDArray
@@ -5,14 +6,6 @@ from cluster import Cluster
 from collections import OrderedDict
 import numpy as np
 
-# Maybe I should have a mapping class that contains all the dictionaries
-#  all the refrences even k values or such, a container for all data they waY I use it
-
-
-# you can do it based on snap shot of whole image or part of image
-#  you can do it based on individual clusters. a for loop over all clusters. they
-# all search in their neighborhood for points (or whole image because veins propagate through grid)
-TODO: "Merge set--absorbtion dict- loss- dict" "to control the flow of code"
 
 cluster_2_grid_dict = Dict[int, Set[Tuple[int, int]]]
 grid_2_data_dict = Dict[Tuple[int, int], NDArray]
@@ -21,24 +14,25 @@ grid_2_cluster_dict = Dict[Tuple[int, int], int]
 GRAVITY_CONSTANT_3D = np.sqrt(2 * np.pi ** 3)
 
 
+@dataclass(slots=True)
 class Model:
-    clusters: Dict[int, Cluster] = OrderedDict()
+    # def __init__(self, image_url: str,
+    #              tile_size: int,
+    #              k_adjustments: NDArray,
+    #              epsilon: float = 10 ** -6,
+    #              scale_image: bool = False):
+    n_columns: int = field(init=False)
+    n_rows: int = field(init=False)
+    image_url: str
+    tile_size: int
+    k_adjustments: NDArray
+    epsilon: float = 10 ** -6
+    scale_image: bool = False
+    grid_2_data: Dict[Tuple[int, int], NDArray] = field(init=False, default_factory=dict)
+    grid_2_cluster: Dict[Tuple[int, int], int] = field(init=False, default_factory=dict)
+    clusters: Dict[int, Cluster] = field(init=False, default_factory=OrderedDict)
 
-    def __init__(self, image_url: str,
-                 tile_size: int,
-                 k_adjustments: NDArray,
-                 epsilon: float = 10 ** -6,
-                 scale_image: bool = False):
-        self.n_columns = None
-        self.n_rows = None
-        self.image_url = image_url
-        self.tile_size = tile_size
-        self.k_adjustments = k_adjustments
-        self.epsilon = epsilon
-        self.scale_image = scale_image
-        self.grid_2_data: Dict[Tuple[int, int], NDArray] = {}
-        self.grid_2_cluster: Dict[Tuple[int, int], int] = {}
-        self.clusters: Dict[int, Cluster] = OrderedDict()
+    def __post_init__(self):
         self.__initiate_model()
 
     def __initiate_model(self) -> None:
@@ -107,7 +101,7 @@ def get_hostile_candidate_inclination(grid_list: List[Tuple[int, int]], grid_2_d
         data_minus_clustermean_squared = np.vstack([np.power(grid_2_data[grid] - mean, 2) for grid in grid_list])
     except ValueError:
         data_minus_clustermean_squared = np.reshape(np.asarray([np.power(grid_2_data[grid] - mean, 2)
-                                                                for grid in grid_list]),(len(grid_list),3))
+                                                                for grid in grid_list]), (len(grid_list), 3))
     inv_std = np.power(std, -1)
     k_times_inv_std_squared = np.reshape((k_adjustments * inv_std) ** 2, (3, 1))
 

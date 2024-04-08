@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import NDArray
 from typing import Dict, List, Tuple, Set
 from PIL import Image
-
+import cv2
 image_2_data_dict: Dict[Tuple[int, int], NDArray] = {}
 
 
@@ -136,7 +136,8 @@ def grid_tiling(grid_shape: tuple, tile_size: int) -> Tuple[Dict[int, Set[Tuple[
 
 
 def load_image(image_url: str, standard_scaling=False, round_decimal: int = 6) -> NDArray:
-    image = Image.open(image_url)
+    # image = Image.open(image_url)
+    image = cv2.imread(image_url,0)
     image_array = np.asarray(image)
     if standard_scaling:
         image_array = np.around(image_array / 255, decimals=round_decimal)
